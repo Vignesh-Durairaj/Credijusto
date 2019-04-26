@@ -7,7 +7,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.credijusto.utils.RateProviderUtil;
@@ -16,7 +15,7 @@ import com.credijusto.utils.RateProviderUtil;
 public class ExchangeRateService {
 
 	@GET
-	public Response getFXRates() throws IOException, JSONException, ParseException {
+	public Response getFXRates() throws IOException, ParseException {
 		RateProviderUtil util = new RateProviderUtil();
 		JSONObject fxRatesJson = util.getFxRatesJson();
 		return Response.status(200).entity(fxRatesJson).build();
