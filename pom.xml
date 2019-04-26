@@ -10,13 +10,13 @@
   
   <name>FXRatesAPI for Credijusto</name>
   
-  <url>http://fxrates.credijusto.com</url>
+  <url>http://maven.apache.org</url>
   
   <build>
 	<sourceDirectory>src/main/java</sourceDirectory>
   	<testSourceDirectory>src/test/java</testSourceDirectory>
   	
-  	<finalName>FXRatesAPI</finalName>
+  	<finalName>Credijusto</finalName>
   	
   </build>
 	
