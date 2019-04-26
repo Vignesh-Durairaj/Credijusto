@@ -6,16 +6,17 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
-import com.credijusto.model.FXRateModel;
+import org.json.JSONObject;
+
 import com.credijusto.utils.RateProviderUtil;
 
-@Path("/fixer")
+@Path("/rates")
 public class ExchangeRateService {
 
 	@GET
 	public Response getFXRates() throws IOException {
 		RateProviderUtil util = new RateProviderUtil();
-		FXRateModel fixerRateModel = util.getFixerRate();
-		return Response.status(200).entity(fixerRateModel).build();
+		JSONObject fxRatesJson = util.getFxRatesJson();
+		return Response.status(200).entity(fxRatesJson).build();
 	}
 }
