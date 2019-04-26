@@ -15,8 +15,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.credijusto.model.FXRateModel;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlTableRow;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation", "unchecked"})
 public class RateProviderUtil {
 
 	public FXRateModel getFixerRate() throws IOException {
@@ -51,11 +55,28 @@ public class RateProviderUtil {
 		return fxRateModel;
 	}
 	
-	public FXRateModel getDofRate() {
+	public FXRateModel getDofRate() throws ParseException {
 		FXRateModel fxRateModel = new FXRateModel();
-		fxRateModel.setProviderName("Diario Official de la Federacion(Hardcoded)");
-		fxRateModel.setFxRate(18.931174);
-		fxRateModel.setLastUpdatedDate(new Date());
+		HtmlPage page = null;
+		
+		try (WebClient client = new WebClient()){
+			client.getOptions().setCssEnabled(false);
+			client.getOptions().setJavaScriptEnabled(false);
+			String urlString = "http://www.banxico.org.mx/tipcamb/tipCamMIAction.do";
+			page = client.getPage(urlString);
+		} catch(Exception e) {
+			throw new IllegalArgumentException("Unable to scrap out data from web");
+		}
+		
+		List<HtmlTableRow> items = (List<HtmlTableRow>) page.getByXPath("//tr[@class='renglonNon']");
+		if (!items.isEmpty()) {
+			List<HtmlElement> tableData = items.get(0).getElementsByTagName("td");
+			if (!tableData.isEmpty()) {
+				fxRateModel.setProviderName("Diario Official de la Federacion");
+				fxRateModel.setFxRate(Double.valueOf(tableData.get(1).asText()));
+				fxRateModel.setLastUpdatedDate((new SimpleDateFormat("dd/MM/yyyy")).parse(tableData.get(0).asText()));
+			}
+		}
 		
 		return fxRateModel;
 	}
@@ -75,9 +96,7 @@ public class RateProviderUtil {
 		df.setTimeZone(TimeZone.getTimeZone("GMT"));
 		
 		JSONObject providerJson = new JSONObject(), responseJson = new JSONObject();
-		List<FXRateModel> allFXRates = getAllFxRates();
-		
-		for(FXRateModel fxRateModel : allFXRates) {
+		for(FXRateModel fxRateModel : getAllFxRates()) {
 			JSONObject fxRateJson = new JSONObject();
 			fxRateJson.put("value", fxRateModel.getFxRate());
 			fxRateJson.put("last_updated", df.format(fxRateModel.getLastUpdatedDate()));
@@ -89,7 +108,7 @@ public class RateProviderUtil {
 		return responseJson;
 	}
 	
-	public static void main(String[] args) throws  IOException, ParseException {
+	public static void main(String[] args) throws ParseException, IOException {
 		RateProviderUtil util = new RateProviderUtil();
 		System.out.println(util.getFxRatesJson());
 	}
