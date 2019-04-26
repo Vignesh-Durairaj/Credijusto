@@ -107,9 +107,4 @@ public class RateProviderUtil {
 		responseJson.put("rates", providerJson);
 		return responseJson;
 	}
-	
-	public static void main(String[] args) throws ParseException, IOException {
-		RateProviderUtil util = new RateProviderUtil();
-		System.out.println(util.getFxRatesJson());
-	}
 }
